@@ -65,7 +65,9 @@ public class 数据分析
 
                     Orm.Db.Update<TbHospital>()
                         .Set(p => p.SaleOfMonth, hospital.SaleOfMonth)
-                        .Where(p => p.Id == result.Id);
+                        .Where(p => p.Id == result.Id)
+                        .ExecuteAffrows(1);
+
                 }
                 else
                 {
@@ -137,7 +139,8 @@ public class 数据分析
                     hospital.SaleOfMonth += result.SaleOfMonth;
                     Orm.Db.Update<TbHospital>()
                         .Set(p => p.SaleOfMonth, hospital.SaleOfMonth)
-                        .Where(p => p.Id == result.Id);
+                        .Where(p => p.Id == result.Id)
+                        .ExecuteAffrows(1);
                 }
                 else
                 {
@@ -146,7 +149,8 @@ public class 数据分析
 
                 Orm.Db.Update<TbHospital>()
                     .Where(p => p.Id == hospital.Id)
-                    .Set(p => p.Comment + "2023年SIG销量,").ExecuteAffrows(1);
+                    .Set(p => p.Comment + "2023年SIG销量,")
+                    .ExecuteAffrows(1);
             }
 
             Console.WriteLine("2023年SIG销量 处理完成");
@@ -209,7 +213,8 @@ public class 数据分析
                     hospital.SaleOfMonth += result.SaleOfMonth;
                     Orm.Db.Update<TbHospital>()
                         .Set(p => p.SaleOfMonth, hospital.SaleOfMonth)
-                        .Where(p => p.Id == result.Id);
+                        .Where(p => p.Id == result.Id)
+                        .ExecuteAffrows(1);
                 }
                 else
                 {
@@ -218,7 +223,8 @@ public class 数据分析
 
                 Orm.Db.Update<TbHospital>()
                     .Where(p => p.Id == hospital.Id)
-                    .Set(p => p.Comment + "2024年EDR1-3月销量,").ExecuteAffrows(1);
+                    .Set(p => p.Comment + "2024年EDR1-3月销量,")
+                    .ExecuteAffrows(1);
             }
 
             Console.WriteLine("2024年1-3月EDR销量 处理完成");
@@ -229,7 +235,7 @@ public class 数据分析
         #region 2024年1-3月SIG销量
 
         {
-            var path = @"整理数据\2023年SIG销量.txt";
+            var path = @"整理数据\2024年SIG1-3月销量.txt";
             var text = File.ReadAllText(path);
             var rows = text.Split("\r", "\n").Skip(1);
 
@@ -280,7 +286,8 @@ public class 数据分析
                     hospital.SaleOfMonth += result.SaleOfMonth;
                     Orm.Db.Update<TbHospital>()
                         .Set(p => p.SaleOfMonth, hospital.SaleOfMonth)
-                        .Where(p => p.Id == result.Id);
+                        .Where(p => p.Id == result.Id)
+                        .ExecuteAffrows(1);
                 }
                 else
                 {
@@ -289,7 +296,8 @@ public class 数据分析
 
                 Orm.Db.Update<TbHospital>()
                     .Where(p => p.Id == hospital.Id)
-                    .Set(p => p.Comment + "2024年SIG1-3月销量,").ExecuteAffrows(1);
+                    .Set(p => p.Comment + "2024年SIG1-3月销量,")
+                    .ExecuteAffrows(1);
             }
 
             Console.WriteLine("2024年1-3月SIG销量 处理完成");
@@ -377,11 +385,12 @@ public class 数据分析
                         Console.WriteLine($"[{hospitalName}]在{year}年{month}月, 区域经理名字不一样!");
                     }
 
-
+                
                     hospital.SaleOfMonth += result.SaleOfMonth;
                     Orm.Db.Update<TbHospital>()
                         .Set(p => p.SaleOfMonth, hospital.SaleOfMonth)
-                        .Where(p => p.Id == result.Id);
+                        .Where(p => p.Id == result.Id)
+                        .ExecuteAffrows(1);
                 }
                 else
                 {
@@ -390,7 +399,8 @@ public class 数据分析
 
                 Orm.Db.Update<TbHospital>()
                     .Where(p => p.Id == hospital.Id)
-                    .Set(p => p.Comment + "两产品四月销量,").ExecuteAffrows(1);
+                    .Set(p => p.Comment + "两产品四月销量,")
+                    .ExecuteAffrows(1);
             }
 
             Console.WriteLine("两产品2024年4月销售数据 处理完成");

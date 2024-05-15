@@ -17,7 +17,7 @@
     <ItemGroup>
       <PackageReference Include="Pingfan.FreeSql" Version="3.2.810" />
       <PackageReference Include="Pingfan.FreeSql.SqlServerForSystem" Version="3.2.810.1" />
-      <PackageReference Include="Pingfan.Kit" Version="3.9.3" />
+      <PackageReference Include="Pingfan.Kit" Version="3.9.4" />
     </ItemGroup>
 
 </Project>

@@ -8,10 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Pingfan.Kit" Version="3.9.3" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\Model\Model.csproj" />
     </ItemGroup>
 
