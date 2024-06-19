@@ -16,7 +16,7 @@ class Program
         var dbName = Orm.DbName;
 
         if (ProcessEx.IsAdmin)
-            Environment.SetEnvironmentVariable("L5DBConnetionString",
+            Environment.SetEnvironmentVariable("YuXuanDBConnectionString",
                 $"Data Source ={host}; Initial Catalog={dbName}; User ID={user}; Password={pwd};Max Pool Size=4096;Encrypt=True; TrustServerCertificate=True",
                 EnvironmentVariableTarget.Machine);
 

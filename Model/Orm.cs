@@ -18,13 +18,13 @@ public class Orm
     /// <summary>
     /// 数据库连接字符串
     /// </summary>
-    public static readonly string ConnectionString = Config.Get("DBConnectionString");
+    public static readonly string ConnectionString = Config.Get("YuXuanDBConnectionString");
 
     static Orm()
     {
         var dbString = ConnectionString;
         if (dbString.IsNullOrWhiteSpace())
-            dbString = Environment.GetEnvironmentVariable("DBConnectionString", EnvironmentVariableTarget.Machine);
+            dbString = Environment.GetEnvironmentVariable("YuXuanDBConnectionString", EnvironmentVariableTarget.Machine);
 
         if (dbString.IsNullOrWhiteSpace())
         {

@@ -1,0 +1,54 @@
+{
+    "packages": [
+        {
+            "name": "oliver404/pingfan.kit",
+            "version": "1.0.0.0",
+            "version_normalized": "1.0.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/oliverscode/php.pingfan.kit.git",
+                "reference": "bb07bbe4b9aa8bba94521532e531e48ab38d9d85"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/oliverscode/php.pingfan.kit/zipball/bb07bbe4b9aa8bba94521532e531e48ab38d9d85",
+                "reference": "bb07bbe4b9aa8bba94521532e531e48ab38d9d85",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "ext-pdo": "*",
+                "php": ">=7"
+            },
+            "time": "2024-05-29T11:09:19+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "files": [],
+                "classmap": [
+                    "src"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Oliver",
+                    "email": "yplpf96@gmail.com"
+                }
+            ],
+            "description": "工具库提供工作效率",
+            "support": {
+                "issues": "https://github.com/oliverscode/php.pingfan.kit/issues",
+                "source": "https://github.com/oliverscode/php.pingfan.kit/tree/1.0.0.0"
+            },
+            "install-path": "../oliver404/pingfan.kit"
+        }
+    ],
+    "dev": true,
+    "dev-package-names": []
+}
