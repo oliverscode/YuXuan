@@ -67,7 +67,6 @@ public class 数据分析
                         .Set(p => p.SaleOfMonth, hospital.SaleOfMonth)
                         .Where(p => p.Id == result.Id)
                         .ExecuteAffrows(1);
-
                 }
                 else
                 {
@@ -385,7 +384,7 @@ public class 数据分析
                         Console.WriteLine($"[{hospitalName}]在{year}年{month}月, 区域经理名字不一样!");
                     }
 
-                
+
                     hospital.SaleOfMonth += result.SaleOfMonth;
                     Orm.Db.Update<TbHospital>()
                         .Set(p => p.SaleOfMonth, hospital.SaleOfMonth)
@@ -459,9 +458,12 @@ public class 数据分析
                         result.SaleRealName = realName;
                     }
 
+                    var countOfMonth = line[2 + month].ToDecimal();
+                    var amountOfMonth = countOfMonth * 40.81m;
 
-                    result.PlanCountOfMonth += line[2 + month].ToDecimal();
-                    result.PlanSaleOfMonth += result.PlanCountOfMonth * 40.81m;
+
+                    result.PlanCountOfMonth += countOfMonth;
+                    result.PlanSaleOfMonth += amountOfMonth;
                     Orm.Db.Update<TbHospital>()
                         .Set(p => p.PlanCountOfMonth, result.PlanCountOfMonth)
                         .Set(p => p.PlanSaleOfMonth, result.PlanSaleOfMonth)
@@ -538,15 +540,13 @@ public class 数据分析
                             Month = month,
                             Type = "SIG",
                             MgrRealName = mgrName,
-                            SaleRealName = realName
+                            SaleRealName = realName,
                         };
                         Orm.Db.Insert<TbHospital>(result).ExecuteAffrows(1);
                     }
-                    else
-                    {
-                        result.PlanSaleOfMonth += amountOfMonth;
-                        result.PlanCountOfMonth += countOfMonth;
-                    }
+
+                    result.PlanSaleOfMonth += amountOfMonth;
+                    result.PlanCountOfMonth += countOfMonth;
 
                     if (result.SaleRealName != realName)
                     {
@@ -560,8 +560,8 @@ public class 数据分析
 
                     Orm.Db.Update<TbHospital>()
                         // .Set(p => p.PlanSaleOfYear, result.PlanSaleOfYear)
-                        .Set(p => p.PlanSaleOfMonth, amountOfMonth)
-                        .Set(p => p.PlanCountOfMonth, line[2 + month].ToDecimal())
+                        .Set(p => p.PlanSaleOfMonth, result.PlanSaleOfMonth)
+                        .Set(p => p.PlanCountOfMonth, result.PlanCountOfMonth)
                         .Set(p => p.Comment + "2024年SIG指标,")
                         .Where(p => p.HospitalName == hospitalName)
                         .Where(p => p.Year == year)

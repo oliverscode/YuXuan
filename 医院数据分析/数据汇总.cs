@@ -97,11 +97,13 @@ public class 数据汇总
 
 
             // 要hospital中的年份和月份都是要排序后的, 最后一个就是最新的
-            var lastRow = hospital.OrderByDescending(p => p.Year).ThenByDescending(p => p.Month).First();
+            var lastRow = hospital.Where(p => p.Type == currentType)
+                .OrderByDescending(p => p.Year)
+                .ThenByDescending(p => p.Month).FirstOrDefault();
             // 人名
-            var realname = lastRow.SaleRealName;
+            var realname = lastRow?.SaleRealName??"空";
             // 经理名
-            var manager = lastRow.MgrRealName;
+            var manager = lastRow?.MgrRealName??"空";
 
             // 数据来自
             var remark = string.Join('&',

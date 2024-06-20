@@ -22,9 +22,6 @@
       <None Update="整理数据\2023年SIG销量.txt">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="整理数据\2024 EDR 指标信息.txt">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
       <None Update="整理数据\2024年SIG指标原版-SIG.txt">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>

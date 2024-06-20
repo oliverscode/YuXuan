@@ -10,7 +10,8 @@ $pdo->exec('PRAGMA journal_mode = WAL');
 $pdo->exec('PRAGMA cache_size = 20000');
 
 
-function fetchAll($sql, $params = array()) {
+function fetchAll($sql, $params = array())
+{
     global $pdo;
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
@@ -18,9 +19,12 @@ function fetchAll($sql, $params = array()) {
 }
 
 
-function execute($sql, $params = array()) {
+function execute($sql, $params = array()): int
+{
     global $pdo;
     $stmt = $pdo->prepare($sql);
-    return $stmt->execute($params);
+    $stmt->execute($params);
+    $affectedRows = $stmt->rowCount();
+    return $affectedRows;
 }
 
