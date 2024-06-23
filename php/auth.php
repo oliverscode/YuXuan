@@ -26,10 +26,10 @@ if ($action === 'login') {
     <link rel="icon" href="Favicon.png" type="image/png">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.5.0/dist/semantic.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.5.0/dist/semantic.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/semantic-ui/2.5.0/semantic.min.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/semantic-ui/2.5.0/semantic.min.css" rel="stylesheet">
+
     <script src="src/layer/layer.js"></script>
     <title>登录</title>
 </head>

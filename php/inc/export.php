@@ -136,7 +136,7 @@ function exportHospital($year, $month, $productType)
         $growth = round($growth, 2);
 
 
-        $lines .= "$hospitalName,$totalSales,$totalTargetAmount,$totalTargetQuantity,$ytdAchievement,$monthlyTargetAmount,$monthlySales,$monthlyAchievement,$totalContribution,$monthlyContribution,$growth,$mgrName,$saleName\n";
+        $lines .= "$hospitalName,$totalSales,$totalTargetAmount,$totalTargetQuantity,$ytdAchievement,$monthlyTargetAmount,$monthlySales,$monthlyAchievement%,$totalContribution%,$monthlyContribution%,$growth%,$mgrName,$saleName\n";
     }
 
     return $lines;
@@ -301,7 +301,7 @@ function exportMgr($year, $month, $productType)
         $hospitals = implode('&', $hospitals);
         $sales = implode('&', $sales);
 
-        $lines .= "$mgrName,$totalSales,$totalTargetAmount,$totalTargetQuantity,$ytdAchievement,$monthlyTargetAmount,$monthlySales,$monthlyAchievement,$totalContribution,$monthlyContribution,$growth,$hospitals,$sales\n";
+        $lines .= "$mgrName,$totalSales,$totalTargetAmount,$totalTargetQuantity,$ytdAchievement,$monthlyTargetAmount,$monthlySales,$monthlyAchievement%,$totalContribution%,$monthlyContribution%,$growth%,$hospitals,$sales\n";
     }
 
     return $lines;
@@ -447,7 +447,7 @@ function exportSale($year, $month, $productType)
 
         $hospitals = implode('&', $hospitals);
 
-        $lines .= "$saleName,$totalSales,$totalTargetAmount,$totalTargetQuantity,$ytdAchievement,$monthlyTargetAmount,$monthlySales,$monthlyAchievement,$totalContribution,$monthlyContribution,$growth,$mgrName,$hospitals\n";
+        $lines .= "$saleName,$totalSales,$totalTargetAmount,$totalTargetQuantity,$ytdAchievement,$monthlyTargetAmount,$monthlySales,$monthlyAchievement%,$totalContribution%,$monthlyContribution%,$growth%,$mgrName,$hospitals\n";
     }
 
     return $lines;

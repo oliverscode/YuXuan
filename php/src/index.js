@@ -76,6 +76,12 @@ document.getElementById("formHospital").addEventListener("submit", function (eve
 
             compare: function (a, b) {
 
+                // 如果a和b结尾是%，转换为数字比较
+                if (a.endsWith('%') && b.endsWith('%')) {
+                    a = parseFloat(a);
+                    b = parseFloat(b);
+                }
+
                 // 如果是数字，转换为数字比较
                 if (!isNaN(a) && !isNaN(b)) {
                     a = parseFloat(a);

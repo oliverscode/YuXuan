@@ -21,6 +21,8 @@ function analysisData()
 
     analysis2024年两产品销量();
 
+    analysis2024年5月销量();
+
 }
 
 
@@ -276,6 +278,63 @@ function analysis2024年两产品销量()
             $monthlySales = $monthlyVolume * 155.84;
         } else {
             throw new Exception("未知的产品品规[$productCode]");
+        }
+
+
+        $hospital = getHospital($year, $month, $hospitalName, $productType)
+            ?: addHospital($year, $month, $hospitalName, $mgrName, $saleName, $productType);
+
+        $hospital['MonthlySales'] += $monthlySales;
+        updateName($hospital, $mgrName, $saleName);
+        updateHospital($year, $month, $hospitalName, $productType,
+            [
+                'MonthlySales' => $hospital['MonthlySales']
+            ]);
+    }
+}
+
+function analysis2024年5月销量()
+{
+    $path = 'data/2024年5月销量.txt';
+    $list = readData($path);
+    orderByDate($list, '业务月');
+
+    foreach ($list as $row) {
+
+        $year = intval(mb_substr($row['业务月'], 0, 4));
+        $month = intval(mb_substr($row['业务月'], 4, 2));
+
+        $area = new Str($row['所属辖区']);
+        if ($area->contains('一组'))
+            $mgrName = '朱戍馨';
+        else if ($area->contains('二组'))
+            $mgrName = '洪平良';
+        else if ($area->contains('三组'))
+            $mgrName = '张娜';
+        else if ($area->contains('四组'))
+            $mgrName = '狄志伟';
+        $saleName = $area->between('(', ')');
+
+        $hospitalName = $row['医院名称'];
+
+        $monthlyVolume = floatval($row['销量']);
+
+        // 产品品规
+        $productCode = new Str($row['品规']);
+        if ($productCode->contains("艾地罗")) { // 艾地罗是edr   喜格迈是sig
+            $productType = 'EDR';
+            $monthlySales = $monthlyVolume * 40.81;
+        } else if ($productCode->contains('喜格迈') && $productCode->contains('30T')) {
+            $productType = 'SIG';
+            $monthlySales = $monthlyVolume * 47.63;
+        } else if ($productCode->contains('喜格迈') && $productCode->contains('100T')) {
+            $productType = 'SIG';
+            $monthlySales = $monthlyVolume * 155.84;
+        } else if ($productCode->contains('格拉诺赛特')) {
+            continue;
+        } else {
+//            throw new Exception("未知的产品品规[$productCode]");
+            echo "未知的产品品规[$productCode]<br>";
         }
 
 
