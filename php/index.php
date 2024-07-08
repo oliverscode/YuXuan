@@ -24,6 +24,9 @@ if ($action == 'hospital') {
     die('整合成功');
 } else if ($action == 'speed') {
 
+    $cache = new FileCache();
+    $cache->clear();
+
     // 遍历从23年到现在的每一个月份
     for ($year = 2023; $year <= date('Y'); $year++) {
         for ($month = 1; $month <= 12; $month++) {
@@ -41,7 +44,6 @@ if ($action == 'hospital') {
         }
     }
     die('加速成功');
-
 
 }
 
@@ -183,12 +185,11 @@ if ($action == 'hospital') {
                     <label>🥇级别</label>
                     <label>
                         <select name="p_peopleType">
-                            <option value="mgr">经理</option>
-                            <option value="sale" selected>组员</option>
+                            <option value="mgr">地区经理</option>
+                            <option value="sale" selected>销售代表</option>
                         </select>
                     </label>
                 </div>
-
 
                 <div class="field">
                     <button class="ui button " type="submit">🔍 查询数据</button>
@@ -246,7 +247,23 @@ if ($action == 'hospital') {
     let tab = localStorage.getItem('tab');
     if (tab && tab.length > 0) {
         $('.menu .item').tab('change tab', tab);
+        // 同时触发一次查询
+        if (tab === 'first') {
+            document.getElementById("formHospital").dispatchEvent(new Event('submit'));
+        } else if (tab === 'second') {
+            document.getElementById("fromPeople").dispatchEvent(new Event('submit'));
+        }
     }
+
+    // tab切换时，触发一次查询
+    $('.menu .item').click(function () {
+        let tab = $(this).attr('data-tab');
+        if (tab === 'first') {
+            document.getElementById("formHospital").dispatchEvent(new Event('submit'));
+        } else if (tab === 'second') {
+            document.getElementById("fromPeople").dispatchEvent(new Event('submit'));
+        }
+    });
 
 
     // 如果页面上的select元素发生变化，就把选择项保存到localStorage, 以便刷新页面时恢复
@@ -260,7 +277,7 @@ if ($action == 'hospital') {
             document.getElementById("formHospital").dispatchEvent(new Event('submit'));
         }
         // 如果name以p_开头，就提交人员表单
-        if (name.startsWith('p_')) {
+        else if (name.startsWith('p_')) {
             document.getElementById("fromPeople").dispatchEvent(new Event('submit'));
         }
 
@@ -274,6 +291,7 @@ if ($action == 'hospital') {
             $(this).val(value);
         }
     });
+
 
 </script>
 

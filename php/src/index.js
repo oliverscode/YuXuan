@@ -187,8 +187,8 @@ document.getElementById("fromPeople").addEventListener("submit", function (event
 
         document.getElementById("list").innerHTML = tableString;
         var peopleString = "";
-        if (peopleType == "mgr") peopleString = "经理";
-        else if (peopleType == "sale") peopleString = "销售";
+        if (peopleType == "mgr") peopleString = "地区经理";
+        else if (peopleType == "sale") peopleString = "销售代表";
         filename = `${year}年${month}月-${productType}产品-${peopleString}数据.csv`;
 
         $.tablesort.defaults = {

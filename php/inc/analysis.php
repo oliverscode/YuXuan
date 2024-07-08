@@ -525,6 +525,10 @@ function getAsciiCount($str)
 
     // 计算ascii字符的数量
     $ascii = preg_match_all($pattern, $str);
+
+    if ($len == 0) {
+        return 0;
+    }
     // 计算ascii字符的比例
     return $ascii / $len;
 

@@ -13,7 +13,7 @@ function exportHospital($year, $month, $productType)
     foreach ($list as $row) {
         $hospitals[$row['HospitalName']][] = $row;
     }
-    $lines = "医院名称,全年销售额,全年指标金额,全年指标数量,YTD达成百分比,当月指标金额,当月销售金额,当月达成百分比,全年占比贡献,当月占比贡献,同期增长,销售名,经理名\n";
+    $lines = "医院名称,全年销售额,全年指标金额,全年指标数量,YTD达成百分比,当月指标金额,当月销售金额,当月达成百分比,全年占比贡献,当月占比贡献,同期增长,地区经理,销售代表\n";
 
     foreach ($hospitals as $hospital) {
         $hospitalName = '';
@@ -120,11 +120,11 @@ function exportHospital($year, $month, $productType)
             $growth = 100.0 * ($monthlySales / $lastYearSales - 1);
         }
 
-        // 销售名, 先按照年份倒序,再按照月份倒序,再取非空第一个
+        // 销售代表, 先按照年份倒序,再按照月份倒序,再取非空第一个
         $saleName = getLastName($hospital, $year, $month, $productType, 'SaleName');
 
 
-        // 经理名, 先按照年份倒序,再按照月份倒序,再取非空第一个
+        // 地区经理, 先按照年份倒序,再按照月份倒序,再取非空第一个
         $mgrName = getLastName($hospital, $year, $month, $productType, 'MgrName');
 
 
@@ -141,7 +141,7 @@ function exportHospital($year, $month, $productType)
         $growth = round($growth, 2);
 
 
-        $lines .= "$hospitalName,$totalSales,$totalTargetAmount,$totalTargetQuantity,$ytdAchievement,$monthlyTargetAmount,$monthlySales,$monthlyAchievement%,$totalContribution%,$monthlyContribution%,$growth%,$mgrName,$saleName\n";
+        $lines .= "$hospitalName,$totalSales,$totalTargetAmount,$totalTargetQuantity,$ytdAchievement%,$monthlyTargetAmount,$monthlySales,$monthlyAchievement%,$totalContribution%,$monthlyContribution%,$growth%,$mgrName,$saleName\n";
     }
 
     setCacheData(['exportHospital', $year, $month, $productType], $lines);
@@ -175,7 +175,7 @@ function exportMgr($year, $month, $productType)
             continue;
         $mgrs[$mgrName][] = $row;
     }
-    $lines = "经理名,全年销售额,全年指标金额,全年指标数量,YTD达成百分比,当月指标金额,当月销售金额,当月达成百分比,${productType}全年占比贡献,${productType}当月占比贡献,同期增长,医院列表,组员列表\n";
+    $lines = "地区经理,全年销售额,全年指标金额,全年指标数量,YTD达成百分比,当月指标金额,当月销售金额,当月达成百分比,${productType}全年占比贡献,${productType}当月占比贡献,同期增长,医院列表,销售代表列表\n";
 
     foreach ($mgrs as $mgr) {
         $mgrName = $mgr[0]['MgrName'];
@@ -288,7 +288,7 @@ function exportMgr($year, $month, $productType)
                 $hospitals[] = $row['HospitalName'];
         }
 
-        // 组员列表
+        // 销售代表列表
         foreach ($mgr as $row) {
             // 判断是否重复
             if (in_array($row['SaleName'], $sales) == false)
@@ -311,7 +311,7 @@ function exportMgr($year, $month, $productType)
         $hospitals = implode('&', $hospitals);
         $sales = implode('&', $sales);
 
-        $lines .= "$mgrName,$totalSales,$totalTargetAmount,$totalTargetQuantity,$ytdAchievement,$monthlyTargetAmount,$monthlySales,$monthlyAchievement%,$totalContribution%,$monthlyContribution%,$growth%,$hospitals,$sales\n";
+        $lines .= "$mgrName,$totalSales,$totalTargetAmount,$totalTargetQuantity,$ytdAchievement%,$monthlyTargetAmount,$monthlySales,$monthlyAchievement%,$totalContribution%,$monthlyContribution%,$growth%,$hospitals,$sales\n";
     }
     setCacheData(['exportMgr', $year, $month, $productType], $lines);
     return $lines;
@@ -333,7 +333,7 @@ function exportSale($year, $month, $productType)
             continue;
         $sales[$saleName][] = $row;
     }
-    $lines = "组员名,全年销售额,全年指标金额,全年指标数量,YTD达成百分比,当月指标金额,当月销售金额,当月达成百分比,${productType}全年占比贡献,${productType}当月占比贡献,同期增长,经理名,医院列表\n";
+    $lines = "销售代表,全年销售额,全年指标金额,全年指标数量,YTD达成百分比,当月指标金额,当月销售金额,当月达成百分比,${productType}全年占比贡献,${productType}当月占比贡献,同期增长,地区经理,医院列表\n";
 
     foreach ($sales as $mgr) {
         $saleName = $mgr[0]['SaleName'];
@@ -352,7 +352,7 @@ function exportSale($year, $month, $productType)
         $sales = [];
 
 
-        // 所有组员, 当前产品全年销售额
+        // 所有销售代表, 当前产品全年销售额
         $allSales = 0;
         foreach ($list as $row) {
             if ($row['Year'] == $year && $row['ProductType'] == $productType) {
@@ -360,7 +360,7 @@ function exportSale($year, $month, $productType)
             }
         }
 
-        // 所有组员当前月份销售额
+        // 所有销售代表当前月份销售额
         $allMonthlySales = 0;
         foreach ($list as $row) {
             if ($row['Year'] == $year && $row['Month'] == $month && $row['ProductType'] == $productType) {
@@ -462,7 +462,7 @@ function exportSale($year, $month, $productType)
 
         $hospitals = implode('&', $hospitals);
 
-        $lines .= "$saleName,$totalSales,$totalTargetAmount,$totalTargetQuantity,$ytdAchievement,$monthlyTargetAmount,$monthlySales,$monthlyAchievement%,$totalContribution%,$monthlyContribution%,$growth%,$mgrName,$hospitals\n";
+        $lines .= "$saleName,$totalSales,$totalTargetAmount,$totalTargetQuantity,$ytdAchievement%,$monthlyTargetAmount,$monthlySales,$monthlyAchievement%,$totalContribution%,$monthlyContribution%,$growth%,$mgrName,$hospitals\n";
     }
     setCacheData(['exportSale', $year, $month, $productType], $lines);
     return $lines;
