@@ -22,6 +22,27 @@ if ($action == 'hospital') {
 } else if ($action == 'analysis') {
     analysisData();
     die('整合成功');
+} else if ($action == 'speed') {
+
+    // 遍历从23年到现在的每一个月份
+    for ($year = 2023; $year <= date('Y'); $year++) {
+        for ($month = 1; $month <= 12; $month++) {
+            // 遍历每一个产品类型
+            foreach (['EDR', 'SIG'] as $productType) {
+                exportHospital($year, $month, $productType);
+            }
+
+            // 遍历每一个人员类型
+            foreach (['mgr', 'sale'] as $peopleType) {
+                exportPeople($year, $month, 'EDR', $peopleType);
+                exportPeople($year, $month, 'SIG', $peopleType);
+            }
+
+        }
+    }
+    die('加速成功');
+
+
 }
 
 
@@ -38,7 +59,7 @@ if ($action == 'hospital') {
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/semantic-ui/2.5.0/semantic.min.js"></script>
     <link href="https://cdn.bootcdn.net/ajax/libs/semantic-ui/2.5.0/semantic.min.css" rel="stylesheet">
-<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">-->
+    <!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">-->
     <script src="src/layer/layer.js"></script>
 
     <script type="text/javascript"
@@ -51,6 +72,15 @@ if ($action == 'hospital') {
             max-width: 200px;
             overflow: auto;
             white-space: nowrap;
+        }
+
+        /*    给下面的表格加一个模糊效果, 鼠标放下去就变清晰 */
+        table {
+            transition: all 0.5s;
+        }
+
+        table:hover {
+            filter: blur(0);
         }
 
     </style>
@@ -66,7 +96,7 @@ if ($action == 'hospital') {
 <div class="ui bottom attached tab segment active" data-tab="first">
 
     <div class="ui" style="width: fit-content;">
-        <form class="ui form" id="formHospital">
+        <form class="ui form" id="formHospital" onsubmit="return false;">
             <div class="inline fields" style="justify-content: center; text-align: center;">
                 <div class="field">
                     <label>📅年份</label>
@@ -102,7 +132,7 @@ if ($action == 'hospital') {
                     </label>
                 </div>
                 <div class="field">
-                    <button class="ui button" type="submit">🔍 查询数据</button>
+                    <button class="ui button " type="submit">🔍 查询数据</button>
                 </div>
             </div>
         </form>
@@ -111,7 +141,7 @@ if ($action == 'hospital') {
 <div class="ui bottom attached tab segment " data-tab="second">
 
     <div class="ui" style="width: fit-content;">
-        <form class="ui form" id="fromPeople">
+        <form class="ui form" id="fromPeople" onsubmit="return false;">
             <div class="inline fields" style="justify-content: center; text-align: center;">
 
                 <div class="field">
@@ -171,10 +201,11 @@ if ($action == 'hospital') {
 <div class="ui bottom attached tab segment " data-tab="third">
 
     <div class="ui" style="width: fit-content;">
-        <form class="ui form" id="formYang">
+        <form class="ui form">
             <div class="inline fields" style="justify-content: center; text-align: center;">
                 <div class="field">
-                    <button class="ui button" type="submit">整合数据</button>
+                    <button class="ui button" type="button" id="btnAnalysis">整合数据</button>
+                    <button class="ui button" type="button" id="btnSpeed">加速查询</button>
                 </div>
             </div>
         </form>
@@ -194,6 +225,7 @@ if ($action == 'hospital') {
         </form>
     </div>
 </div>
+
 
 <table class="ui sortable celled table" id="list">
 
@@ -222,6 +254,17 @@ if ($action == 'hospital') {
         let name = $(this).attr('name');
         let value = $(this).val();
         localStorage.setItem(name, value);
+
+        // 如果name以h_开头，就提交医院表单
+        if (name.startsWith('h_')) {
+            document.getElementById("formHospital").dispatchEvent(new Event('submit'));
+        }
+        // 如果name以p_开头，就提交人员表单
+        if (name.startsWith('p_')) {
+            document.getElementById("fromPeople").dispatchEvent(new Event('submit'));
+        }
+
+
     });
     // 页面加载时，恢复select元素的选择项
     $('select').each(function () {
@@ -231,7 +274,6 @@ if ($action == 'hospital') {
             $(this).val(value);
         }
     });
-
 
 </script>
 

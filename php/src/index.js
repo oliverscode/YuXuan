@@ -7,10 +7,13 @@ document.getElementById("formHospital").addEventListener("submit", function (eve
     const month = document.querySelector('#formHospital select[name="h_month"]').value;
     const productType = document.querySelector('#formHospital select[name="h_productType"]').value;
 
+    // 获取表单中的提交按钮
+    var submitBtn = document.querySelector('#formHospital button[type="submit"]');
+    // 禁用按钮
+    submitBtn.disabled = true;
 
     // layer显示一个加载动画
     var layerId = layer.load(1);
-
     // ajax请求
     fetch('index.php?action=hospital', {
         method: 'POST',
@@ -103,6 +106,7 @@ document.getElementById("formHospital").addEventListener("submit", function (eve
         console.error('Error:', error);
         layer.msg('分析失败，请稍后再试！')
     }).finally(() => {
+        submitBtn.disabled = false;
         layer.close(layerId);
     });
 
@@ -117,6 +121,10 @@ document.getElementById("fromPeople").addEventListener("submit", function (event
     const peopleType = document.querySelector('#fromPeople select[name="p_peopleType"]').value;
     const productType = document.querySelector('#fromPeople select[name="p_productType"]').value;
 
+    // 获取表单中的提交按钮
+    var submitBtn = document.querySelector('#formHospital button[type="submit"]');
+    // 禁用按钮
+    submitBtn.disabled = true;
 
     // layer显示一个加载动画
     var layerId = layer.load(1);
@@ -213,13 +221,14 @@ document.getElementById("fromPeople").addEventListener("submit", function (event
         console.error('Error:', error);
         layer.msg('分析失败，请稍后再试！')
     }).finally(() => {
+        submitBtn.disabled = false;
         layer.close(layerId);
     });
 
     return false;
 });
 
-document.getElementById("formYang").addEventListener("submit", function (event) {
+document.getElementById("btnAnalysis").addEventListener("click", function (event) {
 
     event.preventDefault();
 
@@ -238,17 +247,52 @@ document.getElementById("formYang").addEventListener("submit", function (event) 
         // 返回的是普通文本，所以不能用json()方法
         return response.text();
     }).then(data => {
-        // 弹框
+
         layer.open({
-            type: 1,
             title: '整合结果',
-            content: '<div style="padding: 20px;">' + data + '</div>'
+            content: data,
+            shadeClose: true
         });
+
     }).finally(() => {
         layer.close(layerId);
     });
 
+    return false;
+
 });
+document.getElementById("btnSpeed").addEventListener("click", function (event) {
+    event.preventDefault();
+
+    // layer显示一个加载动画
+    var layerId = layer.load(1);
+
+    // ajax请求
+    fetch('index.php?action=speed', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({})
+    }).then(response => {
+        // return response.json()
+        // 返回的是普通文本，所以不能用json()方法
+        return response.text();
+    }).then(data => {
+
+        layer.open({
+            title: '整合结果',
+            content: data,
+            shadeClose: true
+        });
+
+    }).finally(() => {
+        layer.close(layerId);
+    });
+
+    return false;
+});
+
 
 document.getElementById("btnExport").addEventListener("click", function (event) {
 
@@ -297,7 +341,13 @@ document.getElementById("btnExport").addEventListener("click", function (event) 
         link.click();
         document.body.removeChild(link);
     }
-
+    // 弹一个成功的框, 带绿色图标 允许遮罩关闭
+    layer.open({
+        title: '导出成功',
+        content: '文件已经成功导出, 请查看下载文件夹！',
+        icon: 1,
+        shadeClose: true
+    });
 
     return false;
 

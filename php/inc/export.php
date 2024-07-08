@@ -2,6 +2,11 @@
 
 function exportHospital($year, $month, $productType)
 {
+    $cacheData = getCacheData(['exportHospital', $year, $month, $productType]);
+    if ($cacheData != '') {
+        return $cacheData;
+    }
+
     $list = fetchAll('SELECT * FROM TbHospital');
 
     $hospitals = [];
@@ -139,6 +144,7 @@ function exportHospital($year, $month, $productType)
         $lines .= "$hospitalName,$totalSales,$totalTargetAmount,$totalTargetQuantity,$ytdAchievement,$monthlyTargetAmount,$monthlySales,$monthlyAchievement%,$totalContribution%,$monthlyContribution%,$growth%,$mgrName,$saleName\n";
     }
 
+    setCacheData(['exportHospital', $year, $month, $productType], $lines);
     return $lines;
 
 }
@@ -156,6 +162,10 @@ function exportPeople($year, $month, $productType, $peopleType)
 
 function exportMgr($year, $month, $productType)
 {
+    $cacheData = getCacheData(['exportMgr', $year, $month, $productType]);
+    if ($cacheData != '') {
+        return $cacheData;
+    }
     $list = fetchAll('SELECT * FROM TbHospital');
 
     $mgrs = [];
@@ -303,12 +313,17 @@ function exportMgr($year, $month, $productType)
 
         $lines .= "$mgrName,$totalSales,$totalTargetAmount,$totalTargetQuantity,$ytdAchievement,$monthlyTargetAmount,$monthlySales,$monthlyAchievement%,$totalContribution%,$monthlyContribution%,$growth%,$hospitals,$sales\n";
     }
-
+    setCacheData(['exportMgr', $year, $month, $productType], $lines);
     return $lines;
 }
 
 function exportSale($year, $month, $productType)
 {
+    $cacheData = getCacheData(['exportSale', $year, $month, $productType]);
+    if ($cacheData != '') {
+        return $cacheData;
+    }
+
     $list = fetchAll('SELECT * FROM TbHospital');
 
     $sales = [];
@@ -449,9 +464,26 @@ function exportSale($year, $month, $productType)
 
         $lines .= "$saleName,$totalSales,$totalTargetAmount,$totalTargetQuantity,$ytdAchievement,$monthlyTargetAmount,$monthlySales,$monthlyAchievement%,$totalContribution%,$monthlyContribution%,$growth%,$mgrName,$hospitals\n";
     }
-
+    setCacheData(['exportSale', $year, $month, $productType], $lines);
     return $lines;
 }
+
+function getCacheData($keys)
+{
+    // 把keys数组转换成字符串
+    $key = implode(',', $keys);
+    $cache = new FileCache();
+    return $cache->get($key, '');
+}
+
+function setCacheData($keys, $data)
+{
+    // 把keys数组转换成字符串
+    $key = implode(',', $keys);
+    $cache = new FileCache();
+    $cache->set($key, $data, 7 * 24 * 3600);
+}
+
 
 function isZero($float, $epsilon = 0.00001)
 {

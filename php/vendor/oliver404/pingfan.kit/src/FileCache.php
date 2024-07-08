@@ -113,7 +113,7 @@ class FileCache
     /**清空缓存*/
     public function clear()
     {
-        $files = glob($this->cachePath . '*');
+        $files = glob($this->cachePath . '/*');
         foreach ($files as $file) {
             if (is_file($file)) {
                 unlink($file);

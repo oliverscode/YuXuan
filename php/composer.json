@@ -1,5 +1,5 @@
 {
     "require": {
-        "oliver404/pingfan.kit": "^1.0"
+        "oliver404/pingfan.kit": "1.0.1"
     }
 }
