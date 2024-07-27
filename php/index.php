@@ -1,49 +1,59 @@
 <?php
+
 require_once 'inc/app.php';
-$action = Req::get('action');
-if ($action == 'hospital') {
-    $year = Req::int('year');
-    $month = Req::int('month');
-    $productType = Req::string('productType');
-    $result = exportHospital($year, $month, $productType);
+global $req;
+
+$action = $req->post('action');
+if ($action == 'export') {
+    $year = $req->int('year');
+    $month = $req->int('month');
+    $type = $req->string('type');
+    $productName = $req->string('productName');
+    $peopleType = $req->string('peopleType');
+
+    $export = new Export();
+
+    if ($type == 'hospital')
+        $result = $export->hospital($year, $month, $productName);
+    else if ($type == 'people') {
+        if ($peopleType == 'mgr')
+            $result = $export->mgr($year, $month, $productName);
+        else if ($peopleType == 'sale')
+            $result = $export->sale($year, $month, $productName);
+    } else if ($type == 'pay') {
+        if ($peopleType == 'mgr')
+            $result = $export->payMgr($year);
+        else if ($peopleType == 'sale')
+            $result = $export->paySale($year);
+    }
+
 
     die($result);
-} else if ($action == 'people') {
-    $year = Req::int('year');
-    $month = Req::int('month');
-    $productType = Req::string('productType');
-    $peopleType = Req::string('peopleType');
-
-
-    $result = exportPeople($year, $month, $productType, $peopleType);
-
-    die($result);
-
 } else if ($action == 'analysis') {
-    analysisData();
+    // analysisData();
     die('整合成功');
 } else if ($action == 'speed') {
 
-    $cache = new FileCache();
-    $cache->clear();
-
-    // 遍历从23年到现在的每一个月份
-    for ($year = 2023; $year <= date('Y'); $year++) {
-        for ($month = 1; $month <= 12; $month++) {
-            // 遍历每一个产品类型
-            foreach (['EDR', 'SIG'] as $productType) {
-                exportHospital($year, $month, $productType);
-            }
-
-            // 遍历每一个人员类型
-            foreach (['mgr', 'sale'] as $peopleType) {
-                exportPeople($year, $month, 'EDR', $peopleType);
-                exportPeople($year, $month, 'SIG', $peopleType);
-            }
-
-        }
-    }
-    die('加速成功');
+//    $cache = new FileCache();
+//    $cache->clear();
+//
+//    // 遍历从23年到现在的每一个月份
+//    for ($year = 2023; $year <= date('Y'); $year++) {
+//        for ($month = 1; $month <= 12; $month++) {
+//            // 遍历每一个产品类型
+//            foreach (['EDR', 'SIG'] as $productName) {
+//                exportHospital($year, $month, $productName);
+//            }
+//
+//            // 遍历每一个人员类型
+//            foreach (['mgr', 'sale'] as $peopleType) {
+//                exportPeople($year, $month, 'EDR', $peopleType);
+//                exportPeople($year, $month, 'SIG', $peopleType);
+//            }
+//
+//        }
+//    }
+//    die('加速成功');
 
 }
 
@@ -56,7 +66,7 @@ if ($action == 'hospital') {
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="icon" href="Favicon.png" type="image/png">
+    <link rel="icon" href="favicon.png" type="image/png">
 
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/semantic-ui/2.5.0/semantic.min.js"></script>
@@ -72,30 +82,27 @@ if ($action == 'hospital') {
         /*        表格的td不能超过200px */
         table td {
             max-width: 200px;
-            overflow: auto;
+            min-height: 30px;
+
+            overflow-x: auto;
+            overflow-y: hidden;
+
+            /*超出就添加滚动条*/
+            /*overflow: auto;*/
             white-space: nowrap;
         }
-
-        /*    给下面的表格加一个模糊效果, 鼠标放下去就变清晰 */
-        table {
-            transition: all 0.5s;
-        }
-
-        table:hover {
-            filter: blur(0);
-        }
-
     </style>
 </head>
 <body>
 
 <div class="ui top attached tabular menu">
-    <a class="item active" data-tab="first">🏥医院数据</a>
-    <a class="item " data-tab="second">👥人员数据</a>
-    <a class="item " data-tab="third">🐒小杨操作区</a>
-    <a class="item " data-tab="fourth">🦁朱总操作区</a>
+    <a class="item active" data-tab="tab_hospital">🏥医院数据</a>
+    <a class="item " data-tab="tab_people">👥人员数据</a>
+    <a class="item " data-tab="tab_pay">💴 投产比</a>
+    <a class="item " data-tab="tab_yang">🐒小杨操作区</a>
+    <a class="item " data-tab="tab_zhu">🦁朱总操作区</a>
 </div>
-<div class="ui bottom attached tab segment active" data-tab="first">
+<div class="ui bottom attached tab segment active" data-tab="tab_hospital">
 
     <div class="ui" style="width: fit-content;">
         <form class="ui form" id="formHospital" onsubmit="return false;">
@@ -104,8 +111,8 @@ if ($action == 'hospital') {
                     <label>📅年份</label>
                     <label>
                         <select name="h_year">
-                            <option value="2023">2023</option>
                             <option value="2024" selected>2024</option>
+                            <option value="2023">2023</option>
                             <!-- 添加更多年份选项 -->
                         </select>
                     </label>
@@ -127,9 +134,10 @@ if ($action == 'hospital') {
                 <div class="field">
                     <label>💊类型</label>
                     <label>
-                        <select name="h_productType">
+                        <select name="h_productName">
                             <option value="EDR" selected>EDR</option>
                             <option value="SIG">SIG</option>
+                            <option value="GRA">GRA</option>
                         </select>
                     </label>
                 </div>
@@ -140,7 +148,7 @@ if ($action == 'hospital') {
         </form>
     </div>
 </div>
-<div class="ui bottom attached tab segment " data-tab="second">
+<div class="ui bottom attached tab segment " data-tab="tab_people">
 
     <div class="ui" style="width: fit-content;">
         <form class="ui form" id="fromPeople" onsubmit="return false;">
@@ -150,8 +158,8 @@ if ($action == 'hospital') {
                     <label>📅年份</label>
                     <label>
                         <select name="p_year">
-                            <option value="2023">2023</option>
                             <option value="2024" selected>2024</option>
+                            <option value="2023">2023</option>
                             <!-- 添加更多年份选项 -->
                         </select>
                     </label>
@@ -174,9 +182,10 @@ if ($action == 'hospital') {
                 <div class="field">
                     <label>💊类型</label>
                     <label>
-                        <select name="p_productType">
+                        <select name="p_productName">
                             <option value="EDR" selected>EDR</option>
                             <option value="SIG">SIG</option>
+                            <option value="GRA">GRA</option>
                         </select>
                     </label>
                 </div>
@@ -199,7 +208,41 @@ if ($action == 'hospital') {
     </div>
 
 </div>
-<div class="ui bottom attached tab segment " data-tab="third">
+<div class="ui bottom attached tab segment " data-tab="tab_pay">
+
+    <div class="ui" style="width: fit-content;">
+        <form class="ui form" id="fromPay" onsubmit="return false;">
+            <div class="inline fields" style="justify-content: center; text-align: center;">
+
+                <div class="field">
+                    <label>📅年份</label>
+                    <label>
+                        <select name="tp_year">
+                            <option value="2024" selected>2024</option>
+                        </select>
+                    </label>
+                </div>
+
+
+                <div class="field">
+                    <label>🥇级别</label>
+                    <label>
+                        <select name="tp_peopleType">
+                            <option value="mgr">地区经理</option>
+                            <option value="sale" selected>销售代表</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div class="field">
+                    <button class="ui button " type="submit">🔍 查询数据</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+<div class="ui bottom attached tab segment " data-tab="tab_yang">
 
     <div class="ui" style="width: fit-content;">
         <form class="ui form">
@@ -213,7 +256,7 @@ if ($action == 'hospital') {
     </div>
 
 </div>
-<div class="ui bottom attached tab segment " data-tab="fourth">
+<div class="ui bottom attached tab segment " data-tab="tab_zhu">
 
     <div class="ui" style="width: fit-content;">
         <form class="ui form">
@@ -227,8 +270,7 @@ if ($action == 'hospital') {
     </div>
 </div>
 
-
-<table class="ui sortable celled table" id="list">
+<table class="ui sortable celled table selectable striped" id="list">
 
 
 </table>
@@ -243,25 +285,43 @@ if ($action == 'hospital') {
         let tab = $(this).attr('data-tab');
         localStorage.setItem('tab', tab);
     });
-    // 页面加载时，恢复tab的选择项
-    let tab = localStorage.getItem('tab');
-    if (tab && tab.length > 0) {
-        $('.menu .item').tab('change tab', tab);
-        // 同时触发一次查询
-        if (tab === 'first') {
-            document.getElementById("formHospital").dispatchEvent(new Event('submit'));
-        } else if (tab === 'second') {
-            document.getElementById("fromPeople").dispatchEvent(new Event('submit'));
+
+    // 页面加载时 恢复 tab
+    $(() => {
+        // 先恢复选择项
+        $('select').each(function () {
+            let name = $(this).attr('name');
+            let value = localStorage.getItem(name);
+            if (value && value.length > 0) {
+                $(this).val(value);
+            }
+        });
+
+
+        let tab = localStorage.getItem('tab');
+        if (tab && tab.length > 0) {
+            $('.menu .item').tab('change tab', tab);
+            // 同时触发一次查询
+            if (tab === 'tab_hospital') {
+                hospitalQuery();
+            } else if (tab === 'tab_people') {
+                peopleQuery();
+            } else if (tab === 'tab_pay') {
+                payQuery();
+            }
         }
-    }
+    });
+
 
     // tab切换时，触发一次查询
     $('.menu .item').click(function () {
         let tab = $(this).attr('data-tab');
-        if (tab === 'first') {
-            document.getElementById("formHospital").dispatchEvent(new Event('submit'));
-        } else if (tab === 'second') {
-            document.getElementById("fromPeople").dispatchEvent(new Event('submit'));
+        if (tab === 'tab_hospital') {
+            hospitalQuery();
+        } else if (tab === 'tab_people') {
+            peopleQuery();
+        } else if (tab === 'tab_pay') {
+            payQuery();
         }
     });
 
@@ -274,21 +334,11 @@ if ($action == 'hospital') {
 
         // 如果name以h_开头，就提交医院表单
         if (name.startsWith('h_')) {
-            document.getElementById("formHospital").dispatchEvent(new Event('submit'));
+            hospitalQuery();
         }
         // 如果name以p_开头，就提交人员表单
         else if (name.startsWith('p_')) {
-            document.getElementById("fromPeople").dispatchEvent(new Event('submit'));
-        }
-
-
-    });
-    // 页面加载时，恢复select元素的选择项
-    $('select').each(function () {
-        let name = $(this).attr('name');
-        let value = localStorage.getItem(name);
-        if (value && value.length > 0) {
-            $(this).val(value);
+            peopleQuery();
         }
     });
 

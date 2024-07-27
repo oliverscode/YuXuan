@@ -1,5 +1,5 @@
 <?php
-require_once 'db.php';
+
 
 /** 添加一个医院
  * @param $year
@@ -7,35 +7,36 @@ require_once 'db.php';
  * @param $hospitalName
  * @param $mgrName
  * @param $saleName
- * @param $productType
+ * @param $productName
  * @return bool
  */
-function addHospital($year, $month, $hospitalName, $mgrName, $saleName, $productType)
+function addHospital($year, $month, $hospitalName, $mgrName, $saleName, $productName)
 {
-    $sql = 'INSERT INTO TbHospital(year, month, hospitalName, mgrName, saleName, productType) VALUES(?, ?, ?, ?, ?, ?)';
-    if (!execute($sql, array($year, $month, $hospitalName, $mgrName, $saleName, $productType))) {
-        throw new Exception('添加医院失败');
-    }
-    return getHospital($year, $month, $hospitalName, $productType);
+    global $db;
+    $sql = 'INSERT INTO TbHospital(year, month, hospitalName, mgrName, saleName, productName) VALUES(?, ?, ?, ?, ?, ?)';
+    $db->execute($sql, array($year, $month, $hospitalName, $mgrName, $saleName, $productName), 1);
+    return getHospital($year, $month, $hospitalName, $productName);
 }
 
 /** 获取一个医院
  * @param $year
  * @param $month
  * @param $hospitalName
- * @param $productType
+ * @param $productName
  * @return array|false
  */
-function getHospital($year, $month, $hospitalName, $productType)
+function getHospital($year, $month, $hospitalName, $productName)
 {
-    $sql = 'SELECT * FROM TbHospital WHERE year = ? AND month = ? AND hospitalName = ? AND productType = ? LIMIT 1';
-    $result = fetchAll($sql, array($year, $month, $hospitalName, $productType));
+    global $db;
+    $sql = 'SELECT * FROM TbHospital WHERE year = ? AND month = ? AND hospitalName = ? AND productName = ? LIMIT 1';
+    $result = $db->query($sql, array($year, $month, $hospitalName, $productName));
     return empty($result) ? false : $result[0];
 }
 
-function updateHospital($year, $month, $hospitalName, $productType, $data)
+function updateHospital($year, $month, $hospitalName, $productName, $data)
 {
 
+    global $db;
     $sql = 'UPDATE TbHospital SET ';
     $params = array();
     foreach ($data as $key => $value) {
@@ -43,13 +44,11 @@ function updateHospital($year, $month, $hospitalName, $productType, $data)
         $params[] = $value;
     }
     $sql = substr($sql, 0, strlen($sql) - 2);
-    $sql .= ' WHERE year = ? AND month = ? AND hospitalName = ? AND productType = ?';
+    $sql .= ' WHERE year = ? AND month = ? AND hospitalName = ? AND productName = ?';
     $params[] = $year;
     $params[] = $month;
     $params[] = $hospitalName;
-    $params[] = $productType;
+    $params[] = $productName;
 
-    if (!execute($sql, $params)) {
-        throw new Exception('更新医院失败');
-    }
+    $db->execute($sql, $params, 1);
 }

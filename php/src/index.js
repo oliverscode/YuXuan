@@ -1,11 +1,9 @@
 var filename = "";
-
-document.getElementById("formHospital").addEventListener("submit", function (event) {
-    event.preventDefault();
+const hospitalQuery = function () {
 
     const year = document.querySelector('#formHospital select[name="h_year"]').value;
     const month = document.querySelector('#formHospital select[name="h_month"]').value;
-    const productType = document.querySelector('#formHospital select[name="h_productType"]').value;
+    const productName = document.querySelector('#formHospital select[name="h_productName"]').value;
 
     // 获取表单中的提交按钮
     var submitBtn = document.querySelector('#formHospital button[type="submit"]');
@@ -15,15 +13,17 @@ document.getElementById("formHospital").addEventListener("submit", function (eve
     // layer显示一个加载动画
     var layerId = layer.load(1);
     // ajax请求
-    fetch('index.php?action=hospital', {
+    fetch('index.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: new URLSearchParams({
+            action: "export",
+            type: "hospital",
             year: year,
             month: month,
-            productType: productType
+            productName: productName
         })
     }).then(response => {
         // return response.json()
@@ -70,7 +70,7 @@ document.getElementById("formHospital").addEventListener("submit", function (eve
     }).then(tableString => {
 
         document.getElementById("list").innerHTML = tableString;
-        filename = `${year}年${month}月-${productType}产品-医院数据.csv`;
+        filename = `${year}年${month}月-${productName}产品-医院数据.csv`;
 
         $.tablesort.defaults = {
 
@@ -111,15 +111,14 @@ document.getElementById("formHospital").addEventListener("submit", function (eve
     });
 
     return false;
-});
-
-document.getElementById("fromPeople").addEventListener("submit", function (event) {
-    event.preventDefault();
+}
+const peopleQuery = function () {
 
     const year = document.querySelector('#fromPeople select[name="p_year"]').value;
     const month = document.querySelector('#fromPeople select[name="p_month"]').value;
     const peopleType = document.querySelector('#fromPeople select[name="p_peopleType"]').value;
-    const productType = document.querySelector('#fromPeople select[name="p_productType"]').value;
+    const productName = document.querySelector('#fromPeople select[name="p_productName"]').value;
+
 
     // 获取表单中的提交按钮
     var submitBtn = document.querySelector('#formHospital button[type="submit"]');
@@ -130,16 +129,18 @@ document.getElementById("fromPeople").addEventListener("submit", function (event
     var layerId = layer.load(1);
 
     // ajax请求
-    fetch('index.php?action=people', {
+    fetch('index.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: new URLSearchParams({
+            action: "export",
+            type: "people",
             year: year,
             month: month,
             peopleType: peopleType,
-            productType: productType
+            productName: productName
         })
     }).then(response => {
         // return response.json()
@@ -189,7 +190,7 @@ document.getElementById("fromPeople").addEventListener("submit", function (event
         var peopleString = "";
         if (peopleType == "mgr") peopleString = "地区经理";
         else if (peopleType == "sale") peopleString = "销售代表";
-        filename = `${year}年${month}月-${productType}产品-${peopleString}数据.csv`;
+        filename = `${year}年${month}月-${productName}产品-${peopleString}数据.csv`;
 
         $.tablesort.defaults = {
 
@@ -226,7 +227,123 @@ document.getElementById("fromPeople").addEventListener("submit", function (event
     });
 
     return false;
-});
+}
+
+const payQuery = function () {
+
+    const year = document.querySelector('#fromPay select[name="tp_year"]').value;
+    const peopleType = document.querySelector('#fromPay select[name="tp_peopleType"]').value;
+
+    // 获取表单中的提交按钮
+    var submitBtn = document.querySelector('#fromPay button[type="submit"]');
+    // 禁用按钮
+    submitBtn.disabled = true;
+
+    // layer显示一个加载动画
+    var layerId = layer.load(1);
+
+    // ajax请求
+    fetch('index.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            action: "export",
+            type: "pay",
+            year: year,
+            peopleType: peopleType,
+        })
+    }).then(response => {
+        // return response.json()
+        // 返回的是普通文本，所以不能用json()方法
+        return response.text();
+    }).then(data => {
+        // console.log(data);
+
+        // 按行分割, 再按逗号分割
+        const lines = data.split('\n')
+
+        var tableString = "";
+        var tableHeadString = "";
+        var index = 0;
+
+        for (const line of lines) {
+            index++;
+            const cells = line.split(',')
+            // 如果是空行，跳过
+            if (cells[0] == "") {
+                continue;
+            }
+
+            if (index == 1) {
+                tableHeadString = "<thead><tr>";
+                for (const cell of cells) {
+                    tableHeadString += `<th>${cell}</th>`;
+                }
+
+                tableHeadString += "</tr></thead>";
+                tableString += tableHeadString;
+            } else {
+                tableString += "<tr>";
+                for (const cell of cells) {
+                    tableString += `<td title="${cell}">${cell}</td>`;
+                }
+
+                tableString += "</tr>";
+
+            }
+        }
+
+        return tableString;
+    }).then(tableString => {
+
+        document.getElementById("list").innerHTML = tableString;
+        var peopleString = "";
+        if (peopleType == "mgr") peopleString = "地区经理";
+        else if (peopleType == "sale") peopleString = "销售代表";
+        filename = `${year}年-${peopleString}投产比.csv`;
+
+        $.tablesort.defaults = {
+
+            asc: 'sorted ascending',
+            desc: 'sorted descending',
+
+            compare: function (a, b) {
+
+
+                // 如果是数字，转换为数字比较
+                if (!isNaN(a) && !isNaN(b)) {
+                    a = parseFloat(a);
+                    b = parseFloat(b);
+                }
+
+
+                if (a > b) {
+                    return 1;
+                } else if (a < b) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        };
+
+        $('#list').tablesort()
+    }).catch(error => {
+        console.error('Error:', error);
+        layer.msg('分析失败，请稍后再试！')
+    }).finally(() => {
+        submitBtn.disabled = false;
+        layer.close(layerId);
+    });
+
+    return false;
+}
+
+document.getElementById("formHospital").addEventListener("submit", hospitalQuery);
+document.getElementById("fromPeople").addEventListener("submit", peopleQuery);
+document.getElementById("fromPay").addEventListener("submit", payQuery);
 
 document.getElementById("btnAnalysis").addEventListener("click", function (event) {
 
@@ -236,12 +353,14 @@ document.getElementById("btnAnalysis").addEventListener("click", function (event
     var layerId = layer.load(1);
 
     // ajax请求
-    fetch('index.php?action=analysis', {
+    fetch('index.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: new URLSearchParams({})
+        body: new URLSearchParams({
+            action: "analysis",
+        })
     }).then(response => {
         // return response.json()
         // 返回的是普通文本，所以不能用json()方法
@@ -261,6 +380,7 @@ document.getElementById("btnAnalysis").addEventListener("click", function (event
     return false;
 
 });
+
 document.getElementById("btnSpeed").addEventListener("click", function (event) {
     event.preventDefault();
 
@@ -268,12 +388,14 @@ document.getElementById("btnSpeed").addEventListener("click", function (event) {
     var layerId = layer.load(1);
 
     // ajax请求
-    fetch('index.php?action=speed', {
+    fetch('index.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: new URLSearchParams({})
+        body: new URLSearchParams({
+            action: "speed",
+        })
     }).then(response => {
         // return response.json()
         // 返回的是普通文本，所以不能用json()方法
@@ -292,7 +414,6 @@ document.getElementById("btnSpeed").addEventListener("click", function (event) {
 
     return false;
 });
-
 
 document.getElementById("btnExport").addEventListener("click", function (event) {
 

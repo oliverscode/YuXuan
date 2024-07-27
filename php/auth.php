@@ -1,19 +1,21 @@
 <?php
+global $req, $auth, $log, $config;
 require_once 'inc/app.php';
 
-$action = Req::string('action');
+$action = $req->string('action');
 if ($action === 'login') {
-    $pwd = Req::string('pwd');
-    if ($pwd === 'smart422') {
-        authLogin();
-
+    $pwd = $req->string('pwd');
+    if ($pwd ===  $config['PWD'] ) {
+        $auth->login(true);
+        $log->info('登录成功');
         echo 'ok';
     } else {
         echo '密码错误';
+        $log->info("密码错误, 错误密码为: $pwd");
     }
     die;
 } else if ($action == 'logout') {
-    authLogout();
+    $auth->clear();
     die('ok');
 }
 
@@ -23,7 +25,7 @@ if ($action === 'login') {
 <head>
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta charset="UTF-8">
-    <link rel="icon" href="Favicon.png" type="image/png">
+    <link rel="icon" href="favicon.png" type="image/png">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
